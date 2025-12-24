@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>面试能力评估</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .question-container {
+            padding: 20px;
+            display: none;
+        }
+        .question-container.active {
+            display: block;
+        }
+        .question-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option:hover {
+            background-color: #f9fafb;
+        }
+        .option.selected {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        .option input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+        }
+        .option label {
+            flex: 1;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-prev {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        .btn-next {
+            background-color: #667eea;
+            color: white;
+        }
+        .btn-submit {
+            background-color: #764ba2;
+            color: white;
+            width: 100%;
+        }
+        .result-container {
+            padding: 30px 20px;
+            display: none;
+            text-align: center;
+        }
+        .result-type {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        .result-desc {
+            line-height: 1.8;
+            font-size: 16px;
+            color: #4b5563;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .btn-restart {
+            background-color: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .progress {
+            height: 6px;
+            background-color: #e5e7eb;
+            margin: 0 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #667eea;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>面试能力评估</h1>
+            <p>通过16个专业问题，全面评估你的面试表现</p>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- 问题容器 - 表达呈现维度 (1-4题) -->
+        <div id="question1" class="question-container active">
+            <div class="question-title">1. 自我介绍时，你的表述方式是？</div>
+            <div class="option">
+                <input type="radio" name="q1" value="A" id="q1a">
+                <label for="q1a">结构清晰，重点突出，时长控制在1-2分钟 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q1" value="B" id="q1b">
+                <label for="q1b">内容完整但缺乏逻辑，时长偏长 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q1" value="C" id="q1c">
+                <label for="q1c">内容零散，逻辑混乱，时长不当 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" disabled>上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(1)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question2" class="question-container">
+            <div class="question-title">2. 回答问题时，你的语言表达特点是？</div>
+            <div class="option">
+                <input type="radio" name="q2" value="A" id="q2a">
+                <label for="q2a">简洁明了，用词准确，口齿清晰 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q2" value="B" id="q2b">
+                <label for="q2b">表达清楚但偶有重复，语速偏快/慢 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q2" value="C" id="q2c">
+                <label for="q2c">词不达意，逻辑混乱，紧张卡顿 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(2)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(2)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question3" class="question-container">
+            <div class="question-title">3. 描述过往经历时，你会？</div>
+            <div class="option">
+                <input type="radio" name="q3" value="A" id="q3a">
+                <label for="q3a">用STAR法则结构化描述，突出自身价值 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q3" value="B" id="q3b">
+                <label for="q3b">能讲清事件过程，但缺乏重点和成果量化 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q3" value="C" id="q3c">
+                <label for="q3c">泛泛而谈，缺乏细节，无法体现个人贡献 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(3)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(3)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question4" class="question-container">
+            <div class="question-title">4. 面试中的肢体语言表现如何？</div>
+            <div class="option">
+                <input type="radio" name="q4" value="A" id="q4a">
+                <label for="q4a">坐姿端正，眼神交流自然，手势适度 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q4" value="B" id="q4b">
+                <label for="q4b">基本得体，但偶有紧张小动作 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q4" value="C" id="q4c">
+                <label for="q4c">坐姿随意，回避眼神，频繁小动作 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(4)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(4)">下一题</button>
+            </div>
+        </div>
+
+        <!-- 内容准备维度 (5-8题) -->
+        <div id="question5" class="question-container">
+            <div class="question-title">5. 对应聘岗位的了解程度？</div>
+            <div class="option">
+                <input type="radio" name="q5" value="A" id="q5a">
+                <label for="q5a">深入了解岗位职责、要求及行业背景，有针对性准备 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q5" value="B" id="q5b">
+                <label for="q5b">基本了解岗位信息，有简单准备 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q5" value="C" id="q5c">
+                <label for="q5c">了解甚少，未做针对性准备 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(5)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(5)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question6" class="question-container">
+            <div class="question-title">6. 对常见面试问题的准备情况？</div>
+            <div class="option">
+                <input type="radio" name="q6" value="A" id="q6a">
+                <label for="q6a">提前梳理并演练核心问题，答案有案例支撑 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q6" value="B" id="q6b">
+                <label for="q6b">有大致思路，但未系统准备和演练 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q6" value="C" id="q6c">
+                <label for="q6c">未做准备，临场随意回答 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(6)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(6)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question7" class="question-container">
+            <div class="question-title">7. 对自身优势和劣势的认知？</div>
+            <div class="option">
+                <input type="radio" name="q7" value="A" id="q7a">
+                <label for="q7a">清晰认知并能结合岗位需求阐述，劣势有改进思路 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q7" value="B" id="q7b">
+                <label for="q7b">能说出优势劣势，但缺乏与岗位的结合 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q7" value="C" id="q7c">
+                <label for="q7c">认知模糊，无法清晰表达 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(7)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(7)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question8" class="question-container">
+            <div class="question-title">8. 向面试官提问的准备情况？</div>
+            <div class="option">
+                <input type="radio" name="q8" value="A" id="q8a">
+                <label for="q8a">准备有深度的问题，体现对岗位和公司的思考 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q8" value="B" id="q8b">
+                <label for="q8b">准备基础问题，如薪资福利等 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q8" value="C" id="q8c">
+                <label for="q8c">无准备，或表示没有问题 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(8)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(8)">下一题</button>
+            </div>
+        </div>
+
+        <!-- 应变互动维度 (9-12题) -->
+        <div id="question9" class="question-container">
+            <div class="question-title">9. 面对压力性问题（如质疑、挑战）时？</div>
+            <div class="option">
+                <input type="radio" name="q9" value="A" id="q9a">
+                <label for="q9a">冷静应对，理性解释，不卑不亢 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q9" value="B" id="q9b">
+                <label for="q9b">略有紧张，但能基本回应 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q9" value="C" id="q9c">
+                <label for="q9c">情绪波动，无法有效回应 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(9)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(9)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question10" class="question-container">
+            <div class="question-title">10. 遇到不会回答的问题时？</div>
+            <div class="option">
+                <input type="radio" name="q10" value="A" id="q10a">
+                <label for="q10a">坦诚承认，结合相关经验分享思考过程 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q10" value="B" id="q10b">
+                <label for="q10b">尝试回答，但内容缺乏深度 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q10" value="C" id="q10c">
+                <label for="q10c">回避问题或胡乱作答 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(10)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(10)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question11" class="question-container">
+            <div class="question-title">11. 与面试官的互动交流状态？</div>
+            <div class="option">
+                <input type="radio" name="q11" value="A" id="q11a">
+                <label for="q11a">积极互动，主动引导话题，有效沟通 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q11" value="B" id="q11b">
+                <label for="q11b">被动回应，基本互动但缺乏主动性 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q11" value="C" id="q11c">
+                <label for="q11c">单向回答，无有效互动 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(11)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(11)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question12" class="question-container">
+            <div class="question-title">12. 面对面试官打断或追问时？</div>
+            <div class="option">
+                <input type="radio" name="q12" value="A" id="q12a">
+                <label for="q12a">及时调整思路，精准回应追问要点 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q12" value="B" id="q12b">
+                <label for="q12b">能回应但思路略有混乱 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q12" value="C" id="q12c">
+                <label for="q12c">不知所措，偏离问题核心 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(12)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(12)">下一题</button>
+            </div>
+        </div>
+
+        <!-- 心态状态维度 (13-16题) -->
+        <div id="question13" class="question-container">
+            <div class="question-title">13. 面试整体心态表现？</div>
+            <div class="option">
+                <input type="radio" name="q13" value="A" id="q13a">
+                <label for="q13a">自信从容，展现真实自我 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q13" value="B" id="q13b">
+                <label for="q13b">略有紧张但不影响发挥 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q13" value="C" id="q13c">
+                <label for="q13c">过度紧张，严重影响发挥 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(13)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(13)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question14" class="question-container">
+            <div class="question-title">14. 对面试结果的预期和态度？</div>
+            <div class="option">
+                <input type="radio" name="q14" value="A" id="q14a">
+                <label for="q14a">平常心对待，重在展示和学习 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q14" value="B" id="q14b">
+                <label for="q14b">希望成功但能接受失败 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q14" value="C" id="q14c">
+                <label for="q14c">过度焦虑结果，患得患失 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(14)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(14)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question15" class="question-container">
+            <div class="question-title">15. 面对面试官反馈的态度？</div>
+            <div class="option">
+                <input type="radio" name="q15" value="A" id="q15a">
+                <label for="q15a">虚心接受，积极回应，展现学习能力 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q15" value="B" id="q15b">
+                <label for="q15b">能接受反馈但缺乏积极回应 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q15" value="C" id="q15c">
+                <label for="q15c">抵触反馈，急于辩解 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(15)">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion(15)">下一题</button>
+            </div>
+        </div>
+
+        <div id="question16" class="question-container">
+            <div class="question-title">16. 面试后的复盘总结习惯？</div>
+            <div class="option">
+                <input type="radio" name="q16" value="A" id="q16a">
+                <label for="q16a">及时复盘，总结经验教训 (优秀)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q16" value="B" id="q16b">
+                <label for="q16b">有复盘意识但不系统 (良好)</label>
+            </div>
+            <div class="option">
+                <input type="radio" name="q16" value="C" id="q16c">
+                <label for="q16c">无复盘习惯，不总结经验 (待改进)</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="prevQuestion(16)">上一题</button>
+                <button class="btn btn-submit" onclick="calculateResult()">提交答案</button>
+            </div>
+        </div>
+
+        <!-- 结果容器 -->
+        <div class="result-container" id="resultContainer">
+            <h2>你的面试能力评估结果</h2>
+            <div class="result-type" id="resultType"></div>
+            <div class="result-desc" id="resultDesc"></div>
+            <button class="btn-restart" onclick="restartTest()">重新评估</button>
+        </div>
+    </div>
+
+    <script>
+        // 选中选项样式
+        document.querySelectorAll('.option input').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // 清除同组选中样式
+                document.querySelectorAll(`input[name="${this.name}"]`).forEach(r => {
+                    r.closest('.option').classList.remove('selected');
+                });
+                // 添加当前选中样式
+                this.closest('.option').classList.add('selected');
+            });
+        });
+
+        // 下一题
+        function nextQuestion(current) {
+            // 检查是否选择了答案
+            const selected = document.querySelector(`input[name="q${current}"]:checked`);
+            if (!selected) {
+                alert('请选择一个答案继续');
+                return;
+            }
+
+            // 隐藏当前题
+            document.getElementById(`question${current}`).classList.remove('active');
+            // 显示下一题
+            document.getElementById(`question${current + 1}`).classList.add('active');
+            // 更新进度条
+            updateProgress(current + 1);
+        }
+
+        // 上一题
+        function prevQuestion(current) {
+            // 隐藏当前题
+            document.getElementById(`question${current}`).classList.remove('active');
+            // 显示上一题
+            document.getElementById(`question${current - 1}`).classList.add('active');
+            // 更新进度条
+            updateProgress(current - 1);
+        }
+
+        // 更新进度条
+        function updateProgress(questionNum) {
+            const progress = (questionNum / 16) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // 面试能力评估结果描述
+        const interviewDescriptions = {
+            "excellent": {
+                name: "优秀 (85-100分)",
+                desc: "你的面试能力表现出色，具备专业的面试素养和良好的临场发挥能力。在表达呈现、内容准备、应变互动和心态状态四个维度都有优秀的表现，能够清晰、自信地展现自身优势，有效与面试官沟通。继续保持并优化细节，你在求职面试中会有很高的成功率。"
+            },
+            "good": {
+                name: "良好 (70-84分)",
+                desc: "你的面试能力整体良好，具备基本的面试技巧和准备意识。在部分维度表现不错，但仍有提升空间，比如在表达逻辑性、问题准备充分度或心态稳定性方面可以进一步优化。针对性改进薄弱环节后，面试表现会有显著提升。"
+            },
+            "average": {
+                name: "一般 (60-69分)",
+                desc: "你的面试能力处于中等水平，有基础但不够扎实。在多个维度存在明显短板，比如准备不充分、表达不清晰、应变能力不足或心态紧张等问题。建议系统学习面试技巧，加强针对性练习，提升整体面试表现。"
+            },
+            "poor": {
+                name: "待改进 (60分以下)",
+                desc: "你的面试能力亟待提升，在核心维度都存在明显问题。可能缺乏系统的面试准备，表达能力不足，临场应变能力差，且心态调整不到位。建议从基础开始学习面试技巧，多做模拟练习，逐步提升面试综合能力。"
+            }
+        };
+
+        // 计算结果
+        function calculateResult() {
+            // 统计各维度得分 (A=3分, B=2分, C=1分)
+            let totalScore = 0;
+            const dimensionScores = {
+                expression: 0, // 表达呈现 (1-4题)
+                preparation: 0, // 内容准备 (5-8题)
+                adaptability: 0, // 应变互动 (9-12题)
+                mindset: 0 // 心态状态 (13-16题)
+            };
+
+            // 遍历所有问题
+            for (let i = 1; i <= 16; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected) {
+                    let score = 0;
+                    switch(selected.value) {
+                        case 'A': score = 3; break;
+                        case 'B': score = 2; break;
+                        case 'C': score = 1; break;
+                    }
+                    totalScore += score;
+                    
+                    // 按维度分类统计
+                    if (i <= 4) dimensionScores.expression += score;
+                    else if (i <= 8) dimensionScores.preparation += score;
+                    else if (i <= 12) dimensionScores.adaptability += score;
+                    else dimensionScores.mindset += score;
+                }
+            }
+
+            // 计算总分（满分48分，转换为百分制）
+            const percentageScore = Math.round((totalScore / 48) * 100);
+            let level = "";
+            if (percentageScore >= 85) level = "excellent";
+            else if (percentageScore >= 70) level = "good";
+            else if (percentageScore >= 60) level = "average";
+            else level = "poor";
+
+            // 分析薄弱维度
+            const dimensionNames = {
+                expression: "表达呈现",
+                preparation: "内容准备",
+                adaptability: "应变互动",
+                mindset: "心态状态"
+            };
+            let lowestDimension = "";
+            let lowestScore = Infinity;
+            for (const [dim, score] of Object.entries(dimensionScores)) {
+                if (score < lowestScore) {
+                    lowestScore = score;
+                    lowestDimension = dimensionNames[dim];
+                }
+            }
+
+            // 生成结果描述
+            let resultDesc = `${interviewDescriptions[level].desc}\n\n`;
+            resultDesc += `你的综合得分：${percentageScore}分\n\n`;
+            resultDesc += `各维度得分情况：\n`;
+            resultDesc += `- 表达呈现：${dimensionScores.expression}/12分\n`;
+            resultDesc += `- 内容准备：${dimensionScores.preparation}/12分\n`;
+            resultDesc += `- 应变互动：${dimensionScores.adaptability}/12分\n`;
+            resultDesc += `- 心态状态：${dimensionScores.mindset}/12分\n\n`;
+            resultDesc += `你的薄弱环节：${lowestDimension}\n`;
+            resultDesc += `改进建议：针对${lowestDimension}维度加强练习，${lowestDimension === "表达呈现" ? "提升语言组织和表达能力，多做模拟演练" : 
+                        lowestDimension === "内容准备" ? "提前系统准备面试问题，梳理个人经历和案例" : 
+                        lowestDimension === "应变互动" ? "增加模拟面试练习，提升临场应变能力" : 
+                        "调整面试心态，通过充分准备建立自信"}。`;
+
+            // 显示结果
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.style.display = 'none';
+            });
+            document.getElementById('resultContainer').style.display = 'block';
+            document.getElementById('resultType').textContent = interviewDescriptions[level].name;
+            document.getElementById('resultDesc').textContent = resultDesc;
+        }
+
+        // 重新测试
+        function restartTest() {
+            // 重置选中状态
+            document.querySelectorAll('.option input').forEach(radio => {
+                radio.checked = false;
+                radio.closest('.option').classList.remove('selected');
+            });
+
+            // 隐藏结果，显示第一题
+            document.getElementById('resultContainer').style.display = 'none';
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.remove('active');
+                q.style.display = 'none';
+            });
+            document.getElementById('question1').classList.add('active');
+            document.getElementById('question1').style.display = 'block';
+            
+            // 重置进度条
+            updateProgress(1);
+        }
+
+        // 初始化进度条
+        updateProgress(1);
+    </script>
+</body>
+</html>
